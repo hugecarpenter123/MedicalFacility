@@ -146,6 +146,7 @@ hs_err_pid*
 
 # custom
 secret_key.txt
+.idea
 
 # mypy
 .mypy_cache/
