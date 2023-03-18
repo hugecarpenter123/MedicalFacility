@@ -5,14 +5,9 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class PersonelSerializer(serializers.ModelSerializer):
-    # specjalnosc = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Personel
         fields = ['id', 'imie', 'nazwisko']
-
-    # def get_specjalnosc(self, obj):
-    #     spec_obj = Specjalnosc.objects.get(id=obj.pk)
-    #     return SpecjalnoscShortSerializer(spec_obj).data
 
 
 class SpecjalnoscSerializer(serializers.ModelSerializer):
@@ -39,12 +34,10 @@ class WizytaSerializer(serializers.ModelSerializer):
     def get_personel(self, obj):
         termin_obj = Termin.objects.get(id=obj.termin.id)
         personel = Personel.objects.get(id=termin_obj.personel.id)
-        # return PersonelSerializer(personel, many=False).data
         return f"{personel.imie} {personel.nazwisko}"
 
     def get_termin(self, obj):
         termin_obj = Termin.objects.get(id=obj.termin.id)
-        # return TerminSerializer(termin_obj, many=False).data
         return termin_obj.data
 
 class UzytkownikSerializer(serializers.ModelSerializer):
@@ -104,5 +97,3 @@ class UzytkownikCreationSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return new_user
-
-

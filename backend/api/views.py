@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from accounts.models import Specjalnosc, Personel, Termin, Wizyta
 from rest_framework import mixins
 from . import serializers
@@ -36,7 +36,6 @@ class PersonelView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retrie
 
 
 class TerminView(generics.GenericAPIView, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
-    # queryset = Termin.objects.all().order_by('data')
     serializer_class = serializers.TerminSerializer
 
     def get(self, request, pk=None, *args, **kwargs):
@@ -130,3 +129,21 @@ class UzytkownikView(APIView):
 
     def delete(self, request, pk):
         return
+
+class UzytkownikLoginView(APIView):
+    def post(self, request, pk=None):
+        login = request.data.get('login', None)
+        password = request.data.get('password', None)
+
+        # sprawdź czy login jest numeryczny, jeśli tak - sprawdź czy istnieje taki pesel
+        if isinstance(login, int) or login.isnumeric():
+            query = User.objects.filter(pesel=login)
+            if query:
+                login = query[0].username
+
+        user = authenticate(username=login, password=password)
+        if user:
+            return Response({'isAuthenticated': True, 'id': user.id}, status=status.HTTP_200_OK)
+        else:
+            return Response({'isAuthenticated': False, 'id': None}, status=status.HTTP_200_OK)
+
