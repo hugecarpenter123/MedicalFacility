@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PlacowkaMedycznaJava</string>
+    <string name="username">Pesel / Nazwa użytkownika</string>
+    <string name="Login">Logowanie</string>
+    <string name="password">Hasło</string>
+    <string name="log_in">Zaloguj</string>
+    <string name="redirect_register">Zarejestruj konto tutaj</string>
+</resources>
