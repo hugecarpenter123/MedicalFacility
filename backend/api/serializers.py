@@ -97,3 +97,4 @@ class UzytkownikCreationSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return new_user
+
