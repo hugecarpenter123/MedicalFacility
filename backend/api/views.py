@@ -135,6 +135,9 @@ class UzytkownikLoginView(APIView):
         login = request.data.get('login', None)
         password = request.data.get('password', None)
 
+        if not (login and password):
+            return Response({'isAuthenticated': False, 'id': None}, status=status.HTTP_400_BAD_REQUEST)
+
         # sprawdź czy login jest numeryczny, jeśli tak - sprawdź czy istnieje taki pesel
         if isinstance(login, int) or login.isnumeric():
             query = User.objects.filter(pesel=login)
@@ -147,3 +150,22 @@ class UzytkownikLoginView(APIView):
         else:
             return Response({'isAuthenticated': False, 'id': None}, status=status.HTTP_200_OK)
 
+# class SearchInfoView(APIView):
+#     serializer_class = serializers.InfoSerializer(many=True)
+#
+#     def get(self, request, pk=None):
+#         return Response(self.serializer_class.data, status=status.HTTP_200_OK)
+
+
+class SearchInfoView(APIView):
+    specjalnosc_qs = Specjalnosc.objects.all()
+    personel_qs = Personel.objects.all()
+
+    def get(self, request, pk=None):
+        specjalnosc_list = [x.nazwa for x in self.specjalnosc_qs]
+        personel_list = [f"{x.imie} {x.nazwisko}" for x in self.personel_qs]
+        data = {
+            "specjalnosc": specjalnosc_list,
+            "personel": personel_list
+        }
+        return Response(data, status=status.HTTP_200_OK)
