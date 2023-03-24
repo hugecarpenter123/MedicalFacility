@@ -18,12 +18,14 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.HashMap;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        AppointmentSearchFragment.AppointmentSearchFragmentListener {
 
     int userID;
     DrawerLayout drawerLayout;
     FrameLayout fragment_container;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,5 +108,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onSearchClick(HashMap<String, String> getParams) {
+        // open new fragment
+        AppointmentListFragment listFragment = new AppointmentListFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, listFragment).commit();
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        // call function on that fragment that will request appointments with params from previous Fragment
+        listFragment.callForAppointments(getParams);
+
+        Toast.makeText(this, "params: " + getParams, Toast.LENGTH_LONG).show();
     }
 }

@@ -65,9 +65,25 @@
                 android:padding="10dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
+        <Button
+            tools:visibility="visible"
+            android:visibility="gone"
+            android:id="@+id/date_picker_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="30dp"
+            android:backgroundTint="#CCECECEC"
+            android:padding="10dp"
+            android:drawableRight="@drawable/ic_arrow_dropdown"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:text="22-03-2023" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/search_appointments_btn"
             android:textSize="16sp"
+            android:padding="10dp"
             android:layout_marginHorizontal="20dp"
             android:layout_marginVertical="40dp"
             android:layout_width="match_parent"

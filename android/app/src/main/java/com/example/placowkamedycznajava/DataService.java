@@ -1,7 +1,10 @@
 package com.example.placowkamedycznajava;
 
 import android.content.Context;
+import android.net.Uri;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -19,18 +22,27 @@ import java.util.Map;
 public class DataService {
     public static final String LOGIN_URL = "http://192.168.1.39:8000/api/uzytkownik/zaloguj/";
     public static final String INFO_URL = "http://192.168.1.39:8000/api/info/";
+    public static final String APPOINTMENTS_URL = "http://192.168.1.39:8000/api/termin";
     Context context;
 
     public DataService(Context context) {
         this.context = context;
     }
 
+    // for login Activity
     interface LoginResponseListener {
         void onLoginResponse(JSONObject response);
         void onError(String message);
     }
 
+    // for AppointmentSearchFragment
     interface BaseInfoResponseListener {
+        void onResponse(JSONObject response);
+        void onError(String message);
+    }
+
+    // for AppointmentListFragment
+    interface FilteredAppointmentsResponseListener {
         void onResponse(JSONObject response);
         void onError(String message);
     }
@@ -71,7 +83,6 @@ public class DataService {
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, INFO_URL, null ,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                System.out.println("getBaseInfo() --------------------");
                 baseInfoResponseListener.onResponse(response);
             }
         }, new Response.ErrorListener() {
@@ -79,6 +90,26 @@ public class DataService {
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
                 baseInfoResponseListener.onError(error.toString());
+            }
+        });
+        HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
+    }
+
+    public void getFilteredAppointments(FilteredAppointmentsResponseListener responseListener, HashMap<String, String> queryParams) {
+        Uri.Builder builder = Uri.parse(APPOINTMENTS_URL).buildUpon();
+        if (queryParams.containsKey("personel_id")) builder.appendQueryParameter("personel_id", queryParams.get("personel_id"));
+        if (queryParams.containsKey("data")) builder.appendQueryParameter("data", queryParams.get("data"));
+        if (queryParams.containsKey("specjalnosc_id")) builder.appendQueryParameter("specjalnosc_id", queryParams.get("specjalnosc_id"));
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, builder.toString(), null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                responseListener.onResponse(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                responseListener.onError(error.toString());
             }
         });
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
