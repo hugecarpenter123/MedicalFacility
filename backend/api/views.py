@@ -52,7 +52,8 @@ class TerminView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retrieve
         return Response(serializer.data, status=202)
 
     def get_queryset(self):
-        queryset = Termin.objects.all().order_by('data')
+        # domyślnie zwróć tylko wolne terminy
+        queryset = Termin.objects.filter(status=True).order_by('data')
 
         personel_id = self.request.query_params.get('personel_id', None)
         data = self.request.query_params.get('data', None)
@@ -60,13 +61,27 @@ class TerminView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retrieve
 
         if personel_id:
             queryset = queryset.filter(personel_id=personel_id)
-        if data:
-            data = int(data) if data.isnumeric() else None
-            if data:
-                queryset = queryset.filter(data__date__lt=timezone.now()+timezone.timedelta(days=data))
+
         if specjalnosc_id:
             queryset = queryset.filter(personel__specjalnosc__id=specjalnosc_id)
             print(queryset)
+
+        if data:
+            try:
+                if data.isnumeric():
+                    # np `data = 30` -> weź 30 następnych dni
+                    data = int(data)
+                    queryset = queryset.filter(data__date__lt=timezone.now()+timezone.timedelta(days=data))
+                elif data.rstrip("w").isnumeric():
+                    # np. `data = "10w"` -> weź 10 pierwszych wizyt
+                    num = int(data.rstrip("w"))
+                    queryset = queryset.all()[:num]
+                else:
+                    # obsłuż format 22-03-2023
+                    data = timezone.datetime.strptime(data, "%d-%m-%Y")
+                    queryset = queryset.filter(data__date=data)
+            except Exception as E:
+                print(f"Error occured during processing request get 'data' argument: `{E}`")
 
         return queryset
 
@@ -150,20 +165,13 @@ class UzytkownikLoginView(APIView):
         else:
             return Response({'isAuthenticated': False, 'id': None}, status=status.HTTP_200_OK)
 
-# class SearchInfoView(APIView):
-#     serializer_class = serializers.InfoSerializer(many=True)
-#
-#     def get(self, request, pk=None):
-#         return Response(self.serializer_class.data, status=status.HTTP_200_OK)
-
-
 class SearchInfoView(APIView):
     specjalnosc_qs = Specjalnosc.objects.all()
     personel_qs = Personel.objects.all()
 
     def get(self, request, pk=None):
-        specjalnosc_list = [x.nazwa for x in self.specjalnosc_qs]
-        personel_list = [f"{x.imie} {x.nazwisko}" for x in self.personel_qs]
+        specjalnosc_list = [[x.id, x.nazwa] for x in self.specjalnosc_qs]
+        personel_list = [[x.id, f"{x.imie} {x.nazwisko}"] for x in self.personel_qs]
         data = {
             "specjalnosc": specjalnosc_list,
             "personel": personel_list

@@ -17,11 +17,27 @@ class SpecjalnoscSerializer(serializers.ModelSerializer):
         model = Specjalnosc
         fields = ['id', 'nazwa', 'personel_set']
 
-class TerminSerializer(serializers.ModelSerializer):
+class TerminFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Termin
         fields = ['id', 'data', 'status', 'personel_id']
 
+class TerminSerializer(serializers.ModelSerializer):
+    personel = serializers.SerializerMethodField(read_only=True)
+    specjalnosc = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Termin
+        fields = ['id', 'data', 'personel', 'specjalnosc']
+
+    def get_personel(self, obj):
+        personel_obj = Personel.objects.get(pk=obj.personel_id)
+        personel = f"{personel_obj.imie} {personel_obj.nazwisko}"
+        return personel
+
+    def get_specjalnosc(self, obj):
+        specjalnsoc = Personel.objects.get(pk=obj.personel_id).specjalnosc.nazwa
+        return specjalnsoc
 
 class WizytaSerializer(serializers.ModelSerializer):
     personel = serializers.SerializerMethodField(read_only=True)
