@@ -23,6 +23,7 @@ public class DataService {
     public static final String LOGIN_URL = "http://192.168.1.39:8000/api/uzytkownik/zaloguj/";
     public static final String INFO_URL = "http://192.168.1.39:8000/api/info/";
     public static final String APPOINTMENTS_URL = "http://192.168.1.39:8000/api/termin";
+    public static final String BOOK_APPOINTMENT_URL = "http://192.168.1.39:8000/api/wizyta/";
     Context context;
 
     public DataService(Context context) {
@@ -43,6 +44,12 @@ public class DataService {
 
     // for AppointmentListFragment
     interface FilteredAppointmentsResponseListener {
+        void onResponse(JSONObject response);
+        void onError(String message);
+    }
+
+    // for AppointmentListFragment
+    interface AppointmentBookResponseListener {
         void onResponse(JSONObject response);
         void onError(String message);
     }
@@ -100,6 +107,7 @@ public class DataService {
         if (queryParams.containsKey("personel_id")) builder.appendQueryParameter("personel_id", queryParams.get("personel_id"));
         if (queryParams.containsKey("data")) builder.appendQueryParameter("data", queryParams.get("data"));
         if (queryParams.containsKey("specjalnosc_id")) builder.appendQueryParameter("specjalnosc_id", queryParams.get("specjalnosc_id"));
+        System.out.println("Final url to get data from: " + builder.toString());
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, builder.toString(), null ,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -113,5 +121,48 @@ public class DataService {
             }
         });
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
+    }
+
+    public void getAppointemntsSubpage(FilteredAppointmentsResponseListener responseListener, String subpageUrl) {
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, subpageUrl, null ,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                responseListener.onResponse(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                responseListener.onError(error.toString());
+            }
+        });
+        HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
+    }
+
+    public void bookAppointment(HashMap<String, Integer> queryParams, AppointmentBookResponseListener responseListener) {
+        JSONObject postData = new JSONObject();
+        try {
+            postData.put("termin", queryParams.get("termin"));
+            postData.put("uzytkownik", queryParams.get("uzytkownik"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, BOOK_APPOINTMENT_URL, postData, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject  response) {
+                System.out.println(response);
+                // redirect response to whatever implements
+                responseListener.onResponse(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                // handle invalid response
+                responseListener.onError(error.toString());
+            }
+        });
+        HttpRequestSingleton.getInstance(context).getRequestQueue().add(postRequest);
     }
 }

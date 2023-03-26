@@ -1,0 +1,14 @@
+1. Do menu głównego dodaj 1 odnośnik do pliku historia.html
+Wzór: screen5.png
+
+2. Na stronie historia.html dodaj odnośniki o nazwie "Czytaj całość..."  
+do całości artykułów, które znajdują się w plikach o nazwach: historia1_calosc.html, historia2_calosc.html,itd.
+Strona powinna otworzyć się w nowym oknie przeglądarki.
+Wzór: screen6.png
+
+3. Na stronie z historią pływania dodaj odnośniki wewnętrze do każdej części tekstu. Po kliknięciu na link, powinieneś zostać 
+przeniesiony do odpowiedniej części strony.
+Wzór: screen7.png
+
+4. Na stronie z historią pływania przy każdym tytule utwórz graficzny odnośnik wewnętrzny, który przewinie stronę na jej początek.
+Wzór: screen8.png
