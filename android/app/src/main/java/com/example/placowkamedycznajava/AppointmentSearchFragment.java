@@ -22,11 +22,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -91,6 +93,7 @@ public class AppointmentSearchFragment extends Fragment {
                 // last position indicates default (null)
                 if (position == personelArr.length - 1) {
                     personelQ = null;
+                    System.out.println("Choosen value: " + personelArr[position]);
                 }
                 else {
                     // save in the "spersonelQ" db id of personel
@@ -103,17 +106,19 @@ public class AppointmentSearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position == specialityArr.length - 1) {
+                    System.out.println("specialityQ casted to null");
                     specialityQ = null;
+                } else {
+                    // save in the "specialityQ" db id of speciality
+                    specialityQ = String.valueOf(personelIdArr[position]);
                 }
-                // save in the "specialityQ" db id of speciality
-                specialityQ = String.valueOf(personelIdArr[position]);
             }
         });
 
         dropdownAppointment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getChildCount() - 1 == position) {
+                if (appointmentArr.length - 1 == position) {
                     // show datePickerButton and set appointmentQ to its visible value
                     datePickerButton.setVisibility(View.VISIBLE);
                     appointmentQ = datePickerButton.getText().toString();
@@ -132,6 +137,7 @@ public class AppointmentSearchFragment extends Fragment {
             if (appointmentQ != null) getParams.put("data", appointmentQ);
             if (specialityQ != null) getParams.put("specjalnosc_id", specialityQ);
 
+            System.out.println("getParams for search: " + getParams);
             // this listener must be implemented by MainActivity
             listener.onSearchClick(getParams);
         });
@@ -169,7 +175,7 @@ public class AppointmentSearchFragment extends Fragment {
         // 3.
         appointmentArr = datesQueryHelper.getAppointmentArr();
         dropdownAppointment = view.findViewById(R.id.autoCompleteAppointment);
-        appointmentArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.list_item, appointmentArr);
+        appointmentArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, appointmentArr);
         dropdownAppointment.setAdapter(appointmentArrayAdapter);
     }
 
@@ -194,8 +200,8 @@ public class AppointmentSearchFragment extends Fragment {
                         personelArr[i] = id_data.getString(1);
                     }
                     // add choicless choice
-                    personelArr[personelArr.length - 1] =  getResources().getString(R.string.personel_all_choice);
-                    personelArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.list_item, personelArr);
+                    personelArr[personel.length()] =  getResources().getString(R.string.personel_all_choice);
+                    personelArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, personelArr);
                     dropdownPersonel.setAdapter(personelArrayAdapter);
 
                     // fill dropdown menu speciality
@@ -207,8 +213,8 @@ public class AppointmentSearchFragment extends Fragment {
                         specialityArr[i] = id_data.getString(1);
                     }
                     // add choicless choice
-                    specialityArr[specialityArr.length - 1] =  getResources().getString(R.string.speciality_all_choice);
-                    specialityArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.list_item, specialityArr);
+                    specialityArr[specjalnosc.length()] =  getResources().getString(R.string.speciality_all_choice);
+                    specialityArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, specialityArr);
                     dropdownSpeciality.setAdapter(specialityArrayAdapter);
 
                 } catch (JSONException exception) {

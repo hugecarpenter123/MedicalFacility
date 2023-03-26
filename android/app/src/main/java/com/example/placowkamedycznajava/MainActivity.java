@@ -6,8 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,12 +21,14 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         AppointmentSearchFragment.AppointmentSearchFragmentListener {
 
-    int userID;
+    public static int userID;
     DrawerLayout drawerLayout;
     FrameLayout fragment_container;
 
@@ -81,10 +86,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // 2.2, jeśli drawer jest otwarty to najpierw go zamknij, poźniej super()
     @Override
     public void onBackPressed() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        }
+        // if current fragment is listFragment, redirect to search Fragment
+        else if (currentFragment instanceof AppointmentListFragment) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AppointmentSearchFragment()).commit();
+        }
+
+        else {
+//            super.onBackPressed();
+            showConfirmationDialog();
         }
     }
 
@@ -93,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_appointments:
-                Toast.makeText(MainActivity.this, "nav_appointments clicked()", Toast.LENGTH_SHORT).show();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AppointmentSearchFragment()).commit();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
@@ -104,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this, "nav_settings clicked()", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_logout:
-                Toast.makeText(MainActivity.this, "nav_logout clicked()", Toast.LENGTH_SHORT).show();
+                logUserOut();
                 break;
         }
         return true;
@@ -122,4 +135,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toast.makeText(this, "params: " + getParams, Toast.LENGTH_LONG).show();
     }
+
+    private void showConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Wylogować?")
+                .setCancelable(false)
+                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // do something if Yes is clicked
+                        logUserOut();
+                    }
+                })
+                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // nothing needs to happen
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void logUserOut() {
+        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        finish();
+        // TODO: 26.03.2023 usunąć USER_ID z sharedPreferences
+    }
 }
+
