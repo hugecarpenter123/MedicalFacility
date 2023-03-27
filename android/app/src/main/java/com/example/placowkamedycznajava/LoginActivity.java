@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // TODO: 18.03.2023 remove later --------
-        changeToMainActivity();
+//        changeToMainActivity();
         // ======================================
 
         loginInput = findViewById(R.id.username_input);
@@ -85,6 +85,13 @@ public class LoginActivity extends AppCompatActivity {
                     System.out.println(message);
                 }
             });
+        });
+
+        // redirect the user when clicks on redirect View
+        tvRedirect = findViewById(R.id.redirect_to_register);
+        tvRedirect.setOnClickListener(view -> {
+            startActivity(new Intent(this, RegistrationActivity.class));
+            finish();
         });
     }
 

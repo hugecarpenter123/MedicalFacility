@@ -16,4 +16,18 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_button">Szukaj</string>
+    <string name="Registration">Rejestracja</string>
+    <string name="redirect_login">Masz już konto? Zaloguj się tutaj</string>
+    <string name="username_register">Nazwa użytkownika</string>
+    <string name="first_name_register">Imię</string>
+    <string name="surname_register">Nazwisko</string>
+    <string name="pesel_register">Pesel</string>
+    <string name="phone_register">Numer telefonu</string>
+    <string name="city_register">Miasto</string>
+    <string name="city_code_register">Kod pocztowy np. \"33-230\"</string>
+    <string name="street_register">Ulica</string>
+    <string name="street_number_register">Numer domu/mieszkania</string>
+    <string name="password_repeat">Powtórz hasło</string>
+    <string name="house_number_register">Numer domu/mieszkania</string>
+    <string name="register">Zarejestruj</string>
 </resources>

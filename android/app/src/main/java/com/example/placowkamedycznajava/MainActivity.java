@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         // 4.3 ustaw domyślnie jakiś fragment
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChatFragment()).commit();
-//        navigationView.setCheckedItem(R.id.chat_fragment);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AppointmentSearchFragment()).commit();
+        navigationView.setCheckedItem(R.id.nav_appointments);
 
         // 5.1 wczytaj id zalogowanego użytkownika
         loadData();
