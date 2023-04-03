@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/address_edit_sublayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+
+    <EditText
+        android:id="@+id/city_code_edit_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:ems="12"
+        android:hint="@string/new_city_code"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/city_edit_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/city_code_edit_input"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:ems="12"
+        android:hint="@string/new_city"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/street_edit_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/city_edit_input"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:ems="12"
+        android:hint="@string/new_street"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/house_number_edit_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/street_edit_input"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:ems="12"
+        android:hint="@string/new_house_number"
+        android:textSize="16sp" />
+
+
+    <Button
+        android:id="@+id/address_edit_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/street_edit_input"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@+id/house_number_edit_input"
+        android:text="@string/change_button" />
+
+</RelativeLayout>

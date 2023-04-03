@@ -149,7 +149,8 @@ public class AppointmentSearchFragment extends Fragment {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                String date = String.format("%s-%s-%s", year, month, dayOfMonth);
+                month += 1;
+                String date = String.format("%s-%s-%s", dayOfMonth, month, year);
                 datePickerButton.setText(date);
                 appointmentQ = date;
             }

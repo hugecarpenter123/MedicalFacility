@@ -1,5 +1,6 @@
 package com.example.placowkamedycznajava;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,10 +42,21 @@ public class DatesQueryHelper {
         return DateFor.format(d);
     }
 
-    public String todayDateAsString() {
+    public static String todayDateAsString() {
         Date d = new Date();
         String pattern = "dd-MM-yyyy";
         SimpleDateFormat DateFor = new SimpleDateFormat(pattern, Locale.getDefault());
         return DateFor.format(d);
+    }
+
+    public static String formatDateTime(String datetime_arg) throws ParseException {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            java.text.SimpleDateFormat inputDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault());
+            java.text.SimpleDateFormat outputDateFormat = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
+            Date datetime = inputDateFormat.parse(datetime_arg);
+            return outputDateFormat.format(datetime);
+        }
+        // return without changes if condition not met
+        return datetime_arg;
     }
 }

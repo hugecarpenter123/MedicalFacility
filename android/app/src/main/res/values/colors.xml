@@ -11,4 +11,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#707070</color>
     <color name="transparent">#00000000</color>
+    <color name="subgrey">#D2D2D2</color>
+    <color name="select_hint">#2841EA</color>
 </resources>

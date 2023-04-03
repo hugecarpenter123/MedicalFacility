@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int userID;
     DrawerLayout drawerLayout;
     FrameLayout fragment_container;
+    // adding menu -------
+    Menu drawerMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // 4.1 inicjaluzuj navigation, do którego będzie podpięty itemClick listener
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        drawerMenu = navigationView.getMenu();
 
         // 4.3 ustaw domyślnie jakiś fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AppointmentSearchFragment()).commit();
@@ -78,8 +81,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    @SuppressLint("NonConstantResourceId")
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // TODO: 28.03.2023 Handle actionbar items onClick
         Toast.makeText(MainActivity.this, item.getTitle() + " clicked()", Toast.LENGTH_SHORT).show();
+        switch (item.getItemId()) {
+            case R.id.settings:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
+                unselectAllNavItems();
+                break;
+            case R.id.logout:
+                logUserOut();
+                break;
+        }
         return true;
     }
 
@@ -111,10 +126,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_userPanel:
-                Toast.makeText(MainActivity.this, "nav_userPanel clicked()", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new UserFragment()).commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_settings:
-                Toast.makeText(MainActivity.this, "nav_settings clicked()", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
+                unselectAllNavItems();
                 break;
             case R.id.nav_logout:
                 logUserOut();
@@ -142,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setCancelable(false)
                 .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // do something if Yes is clicked
+                        // yes clicked, log the user out
                         logUserOut();
                     }
                 })
@@ -159,6 +177,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
         finish();
         // TODO: 26.03.2023 usunąć USER_ID z sharedPreferences
+    }
+
+    private void unselectAllNavItems() {
+        for (int i = 0; i < drawerMenu.size(); i++) {
+            drawerMenu.getItem(i).setChecked(false);
+        }
     }
 }
 

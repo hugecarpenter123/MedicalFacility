@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AppointmentSearchFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".AppointmentSearchFragment">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/background"
-        android:scaleType="fitXY"/>
-
-
+        android:scaleType="fitXY"
+        android:src="@drawable/background" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,77 +19,85 @@
         android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/CustomTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="30dp"
-            android:hint="Specjalność"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+            android:background="@drawable/select_rounded_rectangle"
+            android:hint="@string/speciality"
+            app:hintTextAppearance="@style/CustomHintText">
 
             <AutoCompleteTextView
                 android:id="@+id/autoCompleteSpeciality"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/select_rounded_rectangle"
                 android:inputType="none"
-                android:padding="10dp"/>
+                android:padding="8dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/CustomTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="30dp"
-            android:hint="Personel"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+            android:background="@drawable/select_rounded_rectangle"
+            android:hint="@string/personel"
+            app:hintTextAppearance="@style/CustomHintText">
 
             <AutoCompleteTextView
                 android:id="@+id/autoCompletePersonel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/select_rounded_rectangle"
                 android:inputType="none"
-                android:padding="10dp"/>
+                android:padding="8dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/CustomTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="30dp"
-            android:hint="Terminy"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+            android:background="@drawable/select_rounded_rectangle"
+            android:hint="@string/appointment_dates"
+            app:hintTextAppearance="@style/CustomHintText">
 
             <AutoCompleteTextView
                 android:id="@+id/autoCompleteAppointment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/select_rounded_rectangle"
                 android:inputType="none"
-                android:padding="10dp"/>
+                android:padding="10dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            tools:visibility="visible"
-            android:visibility="gone"
             android:id="@+id/date_picker_button"
+            style="@style/CustomTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="30dp"
-            android:backgroundTint="#CCECECEC"
-            android:padding="10dp"
             android:drawableRight="@drawable/ic_arrow_dropdown"
+            android:padding="10dp"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:text="22-03-2023" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/search_appointments_btn"
-            android:textSize="16sp"
-            android:padding="10dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginVertical="40dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/search_button"/>
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="40dp"
+            android:padding="10dp"
+            android:text="@string/search_button"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

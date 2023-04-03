@@ -75,7 +75,7 @@ public class RegistrationActivity extends AppCompatActivity {
         String pwd1 = pwdInput1.getText().toString();
         String pwd2 = pwdInput2.getText().toString();
         String firstName = firstNameInput.getText().toString().trim();
-        String surname = usernameInput.getText().toString().trim();
+        String surname = surnameInput.getText().toString().trim();
         String pesel = peselInput.getText().toString().trim();
         String city = cityInput.getText().toString().trim();
         String cityCode = cityCodeInput.getText().toString().trim();

@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // TODO: 18.03.2023 remove later --------
-//        changeToMainActivity();
+        changeToMainActivity();
         // ======================================
 
         loginInput = findViewById(R.id.username_input);

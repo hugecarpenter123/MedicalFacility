@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:padding="15dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    tools:context=".PersonalSettingsActivity">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:rowCount="2"
+        android:useDefaultMargins="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!--        first name =================== -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="2"
+            android:text="@string/first_name_register"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/first_name_edit_current"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="5"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/first_name_edit_button"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="0.5"
+            android:text="@string/edit"
+            android:textAlignment="textEnd"
+            android:textColor="#6500F6"
+            android:textSize="16sp" />
+
+        <include
+            layout="@layout/first_name_edit_sublayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="3"
+            android:visibility="gone" />
+
+        <!--        Last name =================== -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="2"
+            android:text="@string/last_name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/last_name_edit_current"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="5"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/last_name_edit_button"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="0.5"
+            android:text="@string/edit"
+            android:textAlignment="textEnd"
+            android:textColor="#6500F6"
+            android:textSize="16sp" />
+
+        <include
+            layout="@layout/last_name_edit_sublayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="3"
+            android:visibility="gone" />
+
+        <!--        phone =================== -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="2"
+            android:text="@string/phone"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/phone_edit_current"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="5"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/phone_edit_button"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="0.5"
+            android:text="@string/edit"
+            android:textAlignment="textEnd"
+            android:textColor="#6500F6"
+            android:textSize="16sp" />
+
+        <include
+            layout="@layout/phone_edit_sublayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="3"
+            android:visibility="gone" />
+
+        <!--        address =================== -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="2"
+            android:text="@string/address"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/address_edit_current"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="5"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/address_edit_button"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="0.5"
+            android:text="@string/edit"
+            android:textAlignment="textEnd"
+            android:textColor="#6500F6"
+            android:textSize="16sp" />
+
+        <include
+            layout="@layout/address_edit_sublayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_columnSpan="3"
+            android:visibility="gone" />
+
+    </GridLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
