@@ -14,4 +14,6 @@ urlpatterns = [
     path('uzytkownik/', views.UzytkownikView.as_view(), name='uzytkownik'),
     path('uzytkownik/<int:pk>/', views.UzytkownikView.as_view(), name='uzytkownik_detail'),
     path('uzytkownik/zaloguj/', views.UzytkownikLoginView.as_view(), name='uzytkownik_login'),
+    path('uzytkownik/konto/<int:pk>/', views.UzytkownikAccountInfoView.as_view(), name='uzytkownik_account_detail'),
+    path('uzytkownik/konto/', views.UzytkownikAccountInfoView.as_view(), name='uzytkownik_account_update'),
 ]

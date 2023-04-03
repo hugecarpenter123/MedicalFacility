@@ -110,7 +110,7 @@ class WizytaView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retrieve
         return Response(serializers.WizytaSerializer(wizyta_obj).data, status=201)
 
     def delete(self, request, pk):
-        # przed usunięciem Wizyty (odwołaniem) przywróć status na TrueFrom
+        # przed usunięciem Wizyty (odwołaniem) przywróć status na True
         termin_pk = Wizyta.objects.get(id=pk).termin.id
         termin_obj_qs = Termin.objects.filter(id=termin_pk)
         if termin_obj_qs:
@@ -140,10 +140,12 @@ class UzytkownikView(APIView):
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk):
-        return
+        # to do.......
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk):
-        return
+        # to do.......
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 class UzytkownikLoginView(APIView):
     def post(self, request, pk=None):
@@ -177,3 +179,16 @@ class SearchInfoView(APIView):
             "personel": personel_list
         }
         return Response(data, status=status.HTTP_200_OK)
+
+class UzytkownikAccountInfoView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    serializer_class = serializers.UzytkownikAccountsSettingsSerializer
+
+    def get_object(self):
+        if 'pk' in self.kwargs:
+            # bacause on GET request app calls this view by appending `.../pk/`
+            user = get_object_or_404(User, pk=self.kwargs['pk'])
+        else:
+            # because all info in put request is contained inside `self.request.data` including pk
+            id = self.request.data.get("id", 0)
+            user = get_object_or_404(User, pk=id)
+        return user

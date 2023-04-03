@@ -33,7 +33,7 @@ class Uzytkownik(AbstractUser):
     password = models.CharField(max_length=150, db_column='haslo')
     stworzony = models.DateTimeField(default=timezone.now, blank=True, null=True)
     pesel = models.BigIntegerField(unique=True, null=True)
-    nr_telefonu = models.IntegerField(null=True)
+    nr_telefonu = models.CharField(max_length=20, null=True)
     miasto = models.CharField(max_length=50)
     kod_pocztowy = models.CharField(max_length=50)
     ulica = models.CharField(max_length=50)
