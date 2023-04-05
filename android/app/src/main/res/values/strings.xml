@@ -13,7 +13,6 @@
     <string name="navigation_drawer_close">Close drawer</string>
     <string name="personel_all_choice">Wszyscy</string>
     <string name="speciality_all_choice">Wszystkie</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_button">Szukaj</string>
     <string name="Registration">Rejestracja</string>
@@ -49,4 +48,27 @@
     <string name="speciality">Specjalność</string>
     <string name="personel">Personel</string>
     <string name="appointment_dates">Terminy</string>
+    <string name="no_connection_toast">Brak połączenia z internetem</string>
+    <string name="register_successfull">Zarejestrowano pomyślnie</string>
+    <string name="db_error_register">Rejestracja nie powiodła się, upewnij się czy pola zostały prawidłowo wypełnione</string>
+    <string name="db_general_error">Wystąpił błąd podczas próby połączenia się z serwerem</string>
+    <string name="booking_confirmation">Czy chcesz zarezerwować tą wizytę?</string>
+    <string name="booking_successfull">Pomyślnie zarezerwowano wizytę</string>
+    <string name="booking_error">Nie udało się zarezerwować wizyty, być może już nie istnieje</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
+    <string name="is_not_authenticated">Użytkownik nie istnieje</string>
+    <string name="appointment_cancel_successfull">Anulowano wizytę</string>
+    <string name="new_name_empty">Nowe imie nie może być puste</string>
+    <string name="new_name_successfull">Pomyślnie zmieniono imię</string>
+    <string name="field_empty_warning">Pole nie może być puste</string>
+    <string name="fields_empty_warning">Pola nie mogą być puste</string>
+    <string name="field_update_successfull">Pomyślnie zaktualizowano twoje dane</string>
+    <string name="db_processing_error">Wydarzył się błąd podczas przetwarzania odpowiedzi serwera</string>
+    <string name="new_email_error">Nowy email jest niepoprawny, być może jest zajęty</string>
+    <string name="new_pwd_successfull">Pomyślnie zmieniono hasło</string>
+    <string name="new_pwds_different">Nowe hasła muszą się zgadzać</string>
+    <string name="new_pwd_error">Wydarzył się błąd. Upewnij się, że wprowadzasz poprawne hasło</string>
+    <string name="company_namy">Medicenter</string>
+    <string name="logout_question">Logout?</string>
 </resources>

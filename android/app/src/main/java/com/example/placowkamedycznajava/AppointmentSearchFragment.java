@@ -18,21 +18,16 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import com.example.placowkamedycznajava.utility.ApiParamNames;
+import com.example.placowkamedycznajava.utility.ConnectionAgent;
+import com.example.placowkamedycznajava.utility.DatesQueryHelper;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.Year;
-import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 
@@ -90,13 +85,12 @@ public class AppointmentSearchFragment extends Fragment {
         dropdownPersonel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // last position indicates default (null)
+                // last position is `choiceless` so set to null
                 if (position == personelArr.length - 1) {
                     personelQ = null;
-                    System.out.println("Choosen value: " + personelArr[position]);
                 }
                 else {
-                    // save in the "spersonelQ" db id of personel
+                    // save in the "spersonelQ" id of personel
                     personelQ = String.valueOf(personelIdArr[position]);
                 }
             }
@@ -106,7 +100,6 @@ public class AppointmentSearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position == specialityArr.length - 1) {
-                    System.out.println("specialityQ casted to null");
                     specialityQ = null;
                 } else {
                     // save in the "specialityQ" db id of speciality
@@ -132,12 +125,17 @@ public class AppointmentSearchFragment extends Fragment {
         // set searchButton onClickListener
         searchButton = view.findViewById(R.id.search_appointments_btn);
         searchButton.setOnClickListener(button -> {
-            HashMap<String, String> getParams = new HashMap<>();
-            if (personelQ != null) getParams.put("personel_id", personelQ);
-            if (appointmentQ != null) getParams.put("data", appointmentQ);
-            if (specialityQ != null) getParams.put("specjalnosc_id", specialityQ);
 
-            System.out.println("getParams for search: " + getParams);
+            if (!ConnectionAgent.isConnected(requireContext())) {
+                Toast.makeText(getContext(), R.string.no_connection_toast, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            HashMap<String, String> getParams = new HashMap<>();
+            if (personelQ != null) getParams.put(ApiParamNames.SEARCH_PERSONEL_ID, personelQ);
+            if (appointmentQ != null) getParams.put(ApiParamNames.SEARCH_DATE, appointmentQ);
+            if (specialityQ != null) getParams.put(ApiParamNames.SEARCH_SPECIALITY_ID, specialityQ);
+
             // this listener must be implemented by MainActivity
             listener.onSearchClick(getParams);
         });
@@ -161,7 +159,7 @@ public class AppointmentSearchFragment extends Fragment {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         datePickerDialog = new DatePickerDialog(getContext(), style, dateSetListener ,year, month, day);
-        datePickerButton.setText(datesQueryHelper.todayDateAsString());
+        datePickerButton.setText(DatesQueryHelper.todayDateAsString());
     }
 
     public void openDatePicker() {
@@ -169,11 +167,8 @@ public class AppointmentSearchFragment extends Fragment {
     }
 
     public void initDropDownMenus(View view) {
-        // 1.
         dropdownSpeciality = view.findViewById(R.id.autoCompleteSpeciality);
-        // 2.
         dropdownPersonel = view.findViewById(R.id.autoCompletePersonel);
-        // 3.
         appointmentArr = datesQueryHelper.getAppointmentArr();
         dropdownAppointment = view.findViewById(R.id.autoCompleteAppointment);
         appointmentArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, appointmentArr);
@@ -183,14 +178,12 @@ public class AppointmentSearchFragment extends Fragment {
     public void fillDropDownMenus() {
         // get request for base data for menus
         DataService dataService = new DataService(getContext());
-        dataService.getBaseInfo(new DataService.BaseInfoResponseListener() {
+        dataService.getBaseInfo(new DataService.JsonObjectResponseListener() {
             @Override
             public void onResponse(JSONObject response) {
-                Toast.makeText(getContext(), "Response from Fragment", Toast.LENGTH_SHORT).show();
                 try {
-                    // retrieve data
-                    JSONArray specjalnosc = response.getJSONArray("specjalnosc");
-                    JSONArray personel = response.getJSONArray("personel");
+                    JSONArray specjalnosc = response.getJSONArray(ApiParamNames.SPECIALITY_ARRAY);
+                    JSONArray personel = response.getJSONArray(ApiParamNames.PERSONEL_ARRAY);
 
                     // fill dropdown menu personel
                     personelArr = new String[personel.length() + 1];
@@ -200,7 +193,7 @@ public class AppointmentSearchFragment extends Fragment {
                         personelIdArr[i] = id_data.getInt(0);
                         personelArr[i] = id_data.getString(1);
                     }
-                    // add choicless choice
+                    // add choiceless choice
                     personelArr[personel.length()] =  getResources().getString(R.string.personel_all_choice);
                     personelArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, personelArr);
                     dropdownPersonel.setAdapter(personelArrayAdapter);
@@ -213,20 +206,21 @@ public class AppointmentSearchFragment extends Fragment {
                         specialityIdArr[i] = id_data.getInt(0);
                         specialityArr[i] = id_data.getString(1);
                     }
-                    // add choicless choice
+                    // add choiceless choice
                     specialityArr[specjalnosc.length()] =  getResources().getString(R.string.speciality_all_choice);
                     specialityArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, specialityArr);
                     dropdownSpeciality.setAdapter(specialityArrayAdapter);
 
                 } catch (JSONException exception) {
                     exception.printStackTrace();
-                    Toast.makeText(getContext(), "Błąd podczas pobierania danych z serwera", Toast.LENGTH_SHORT).show();
+                    // shouldn't happen in production
+                    Toast.makeText(getContext(), R.string.db_processing_error, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(getContext(), "Błąd podczas próby połączenia się z serwerem", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.db_general_error, Toast.LENGTH_SHORT).show();
             }
         });
     }

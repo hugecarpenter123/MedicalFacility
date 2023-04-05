@@ -4,28 +4,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.fonts.SystemFonts;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import static com.example.placowkamedycznajava.utility.ApiParamNames.*;
+import com.example.placowkamedycznajava.utility.ConnectionAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class LoginActivity extends AppCompatActivity {
 
-    public static final String LOGGED_USER_ID = "SHARED_PREF_USER_ID";
+    public static final String SHARED_PREF_USER_ID = "SHARED_PREF_USER_ID";
 
     // app elements
     EditText loginInput;
@@ -54,34 +47,37 @@ public class LoginActivity extends AppCompatActivity {
                 // do something...
                 return;
             }
+            if (!ConnectionAgent.isConnected(this)) {
+                Toast.makeText(LoginActivity.this, R.string.no_connection_toast, Toast.LENGTH_SHORT).show();
+                return;
+            }
             DataService dataService = new DataService(this);
-            dataService.logTheUser(login, password, new DataService.LoginResponseListener() {
+            dataService.logTheUser(login, password, new DataService.JsonObjectResponseListener() {
                 @Override
-                public void onLoginResponse(JSONObject response) {
+                public void onResponse(JSONObject response) {
                     // handle login response
                     try {
-                        boolean isAuthenticated = response.getBoolean("isAuthenticated");
+                        boolean isAuthenticated = response.getBoolean(BOOLEAN_LOGIN_RESPONSE);
                         if (!isAuthenticated) {
                             // handle wrong credentials...
-                            Toast.makeText(LoginActivity.this, "Użytkownik nie istnieje", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, R.string.is_not_authenticated, Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        int id = response.getInt("id");
-                        Toast.makeText(LoginActivity.this, "Użytkownik potwierdzony, id: " + id, Toast.LENGTH_SHORT).show();
+                        int id = response.getInt(ID);
                         // valid credentials log the user in...
                         saveData(id);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
 
                     } catch (JSONException exception) {
-                        Toast.makeText(LoginActivity.this, "Podczas otrzymywania danych wydarzył się błaąd", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, R.string.db_processing_error, Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onError(String message) {
                     // handle error message
-                    Toast.makeText(LoginActivity.this, "Błąd podczas próby połączenia się z bazą danych", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.db_general_error, Toast.LENGTH_SHORT).show();
                     System.out.println(message);
                 }
             });
@@ -103,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
     private void saveData(int data) {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(LOGGED_USER_ID, data);
+        editor.putInt(SHARED_PREF_USER_ID, data);
         editor.apply();
     }
 

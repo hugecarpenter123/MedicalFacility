@@ -1,10 +1,13 @@
 package com.example.placowkamedycznajava;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import static com.example.placowkamedycznajava.utility.ApiParamNames.*;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,12 +20,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class AccountSettingsActivity extends AppCompatActivity {
     int userID;
-    public static final String EMAIL_UPDATE_API = "email";
-    public static final String OLD_PWD_UPDATE_API = "old_password";
-    public static final String NEW_PWD_UPDATE_API = "new_password";
 
     TextView emailEdit, pwdEdit;
     TextView emailLabel;
@@ -39,6 +40,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         // set Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         // get userID
         loadData();
@@ -85,35 +87,34 @@ public class AccountSettingsActivity extends AppCompatActivity {
             String email = emailInput.getText().toString();
             // if email is empty, show message don't process further
             if (email.isEmpty()) {
-                Toast.makeText(this, "Nowy email nie może być pusty", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.field_empty_warning, Toast.LENGTH_LONG).show();
                 return;
             }
 
             // else create hashmap (put request parameter), make put request, deal with response
             HashMap<String, String> putParams = new HashMap<>();
-            putParams.put("id", String.valueOf(userID));
-            putParams.put(EMAIL_UPDATE_API, email);
+            putParams.put(ID, String.valueOf(userID));
+            putParams.put(EMAIL, email);
 
-            new DataService(this)
-                    .updateAccountSettings(putParams, new DataService.JsonObjectResponseListener() {
+            new DataService(this).updateAccountSettings(putParams, new DataService.JsonObjectResponseListener() {
                 @Override
                 public void onResponse(JSONObject response) {
                     System.out.println(response);
                     Toast.makeText(AccountSettingsActivity.this, response.toString(), Toast.LENGTH_LONG).show();
                     try {
-                        String newEmail = response.getString(EMAIL_UPDATE_API);
+                        String newEmail = response.getString(EMAIL);
                         emailLabel.setText(newEmail);
                         emailEditSublayout.setVisibility(View.GONE);
-                        Toast.makeText(AccountSettingsActivity.this, "Pomyślnie zmieniono email", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AccountSettingsActivity.this, R.string.field_update_successfull, Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
-                        Toast.makeText(AccountSettingsActivity.this, "Wydarzył się błąd podczas przetwarzania odpowiedzi serwera", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AccountSettingsActivity.this, R.string.db_processing_error, Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onError(String message) {
                     // TODO: 01.04.2023 change behaviour on different errors
-                    Toast.makeText(AccountSettingsActivity.this, "Email nie poprawny, być może jest zajęty", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AccountSettingsActivity.this, R.string.new_email_error, Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -124,25 +125,25 @@ public class AccountSettingsActivity extends AppCompatActivity {
             String newPwdRepeat = newPwdRepeatInput.getText().toString();
 
             if (oldPwd.isEmpty() || newPwd.isEmpty() || newPwdRepeat.isEmpty()) {
-                Toast.makeText(AccountSettingsActivity.this, "Pola z hasłami muszą być wypełnione", Toast.LENGTH_LONG).show();
+                Toast.makeText(AccountSettingsActivity.this, R.string.fields_empty_warning, Toast.LENGTH_LONG).show();
             } else if (!newPwd.equals(newPwdRepeat)) {
-                Toast.makeText(AccountSettingsActivity.this, "Nowe hasła są różne", Toast.LENGTH_LONG).show();
+                Toast.makeText(AccountSettingsActivity.this, R.string.new_pwds_different, Toast.LENGTH_LONG).show();
             } else {
                 HashMap<String, String> putParams = new HashMap<>();
-                putParams.put("id", String.valueOf(userID));
-                putParams.put(OLD_PWD_UPDATE_API, oldPwd);
-                putParams.put(NEW_PWD_UPDATE_API, newPwd);
+                putParams.put(ID, String.valueOf(userID));
+                putParams.put(UPDATE_OLD_PWD, oldPwd);
+                putParams.put(UPDATE_NEW_PWD, newPwd);
 
                 new DataService(this).updateAccountSettings(putParams, new DataService.JsonObjectResponseListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Toast.makeText(AccountSettingsActivity.this, "Pomyślnie zmieniono hasło", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AccountSettingsActivity.this, R.string.new_pwd_successfull, Toast.LENGTH_LONG).show();
                         pwdEditSublayout.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onError(String message) {
-                        Toast.makeText(AccountSettingsActivity.this, "Wydarzył się błąd, upewnij się, że wprowadzasz poprawne hasło", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AccountSettingsActivity.this, R.string.new_pwd_error, Toast.LENGTH_LONG).show();
                         System.out.println(message);
                     }
                 });
@@ -158,7 +159,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
 
     private void closeAllSubForms(RelativeLayout apartFromThis) {
         for (RelativeLayout relativeLayout : subFormsArr) {
-            // close (set v.GONE) all sub-forms
+            // close all subforms
             if (relativeLayout.getId() != apartFromThis.getId()) {
                 relativeLayout.setVisibility(View.GONE);
             }
@@ -167,7 +168,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
 
     private void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        userID = sharedPreferences.getInt(LoginActivity.LOGGED_USER_ID, -1);
+        userID = sharedPreferences.getInt(LoginActivity.SHARED_PREF_USER_ID, -1);
         if (userID == -1) {
             finish();
         }
@@ -179,18 +180,27 @@ public class AccountSettingsActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 Toast.makeText(AccountSettingsActivity.this, response.toString(), Toast.LENGTH_LONG).show();
                 try {
-                    String email = response.getString(EMAIL_UPDATE_API);
+                    String email = response.getString(EMAIL);
                     emailLabel.setText(email);
                     emailInput.setText(email);
                 } catch (JSONException e) {
-                    Toast.makeText(AccountSettingsActivity.this, "Wydarzył się błąd podczas przetwarzania odpowiedzi serwera", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AccountSettingsActivity.this, R.string.db_processing_error, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(AccountSettingsActivity.this, "Wydarzył się błąd, podczas łączenia się z serwerem", Toast.LENGTH_LONG).show();
+                Toast.makeText(AccountSettingsActivity.this, R.string.db_general_error, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

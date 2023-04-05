@@ -2,7 +2,6 @@ package com.example.placowkamedycznajava;
 
 import android.content.Context;
 import android.net.Uri;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -12,6 +11,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.example.placowkamedycznajava.utility.HttpRequestSingleton;
+
+import static com.example.placowkamedycznajava.utility.ApiParamNames.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +37,6 @@ public class DataService {
         this.context = context;
     }
 
-    // TODO: 01.04.2023 remove all other interfaces, leave universal ones
     interface JsonObjectResponseListener {
         void onResponse(JSONObject response);
 
@@ -47,71 +48,12 @@ public class DataService {
 
         void onError(String error);
     }
-    // =======================================================================
 
-    // for login Activity
-    interface LoginResponseListener {
-        void onLoginResponse(JSONObject response);
-
-        void onError(String message);
-    }
-
-    // for AppointmentSearchFragment
-    interface BaseInfoResponseListener {
-        void onResponse(JSONObject response);
-
-        void onError(String message);
-    }
-
-    // for AppointmentListFragment
-    interface FilteredAppointmentsResponseListener {
-        void onResponse(JSONObject response);
-
-        void onError(String message);
-    }
-
-    // for AppointmentListFragment
-    interface AppointmentBookResponseListener {
-        void onResponse(JSONObject response);
-
-        void onError(String message);
-    }
-
-    // for RegisterActivity
-    interface RegisterResponseListener {
-        void onResponse(String response);
-
-        void onError(String message);
-    }
-
-    // for UserFragment get queryset
-    interface UserAppointmentsResponseListener {
-        void onResponse(JSONObject response);
-
-        void onError(String message);
-    }
-
-    // for UserFragment delete appointment
-    interface AppointmentDeleteResponseListener {
-        void onResponse(String response);
-
-        void onError(String message);
-    }
-
-    // for SettingsActivity
-    interface UserUpdateResponseListener {
-        void onResponse(JSONObject response);
-
-        void onError(String message);
-    }
-
-    public void logTheUser(String login, String password, LoginResponseListener responseListener) {
-        System.out.println("messagePostRequest called() ----------------");
-
+    public void logTheUser(String login, String password, JsonObjectResponseListener responseListener) {
         JSONObject postData = new JSONObject();
         try {
-            postData.put("login", login);
-            postData.put("password", password);
+            postData.put(LOGIN, login);
+            postData.put(PASSWORD, password);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -119,48 +61,44 @@ public class DataService {
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, LOGIN_URL, postData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                System.out.println("onResponse called() ----------------");
-                System.out.println(response);
                 // handle valid response
-                responseListener.onLoginResponse(response);
+                responseListener.onResponse(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, "Error occured during posting the data", Toast.LENGTH_LONG).show();
                 error.printStackTrace();
                 // handle invalid response
                 responseListener.onError(error.toString());
             }
-
         });
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(postRequest);
     }
 
-    public void getBaseInfo(BaseInfoResponseListener baseInfoResponseListener) {
+    public void getBaseInfo(JsonObjectResponseListener responseListener) {
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, INFO_URL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                baseInfoResponseListener.onResponse(response);
+                responseListener.onResponse(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
-                baseInfoResponseListener.onError(error.toString());
+                responseListener.onError(error.toString());
             }
         });
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
     }
 
-    public void getFilteredAppointments(FilteredAppointmentsResponseListener responseListener, HashMap<String, String> queryParams) {
+    public void getFilteredAppointments(JsonObjectResponseListener responseListener, HashMap<String, String> queryParams) {
         Uri.Builder builder = Uri.parse(APPOINTMENTS_URL).buildUpon();
-        if (queryParams.containsKey("personel_id"))
-            builder.appendQueryParameter("personel_id", queryParams.get("personel_id"));
-        if (queryParams.containsKey("data"))
-            builder.appendQueryParameter("data", queryParams.get("data"));
-        if (queryParams.containsKey("specjalnosc_id"))
-            builder.appendQueryParameter("specjalnosc_id", queryParams.get("specjalnosc_id"));
+        if (queryParams.containsKey(SEARCH_PERSONEL_ID))
+            builder.appendQueryParameter(SEARCH_PERSONEL_ID, queryParams.get(SEARCH_PERSONEL_ID));
+        if (queryParams.containsKey(SEARCH_DATE))
+            builder.appendQueryParameter(SEARCH_DATE, queryParams.get(SEARCH_DATE));
+        if (queryParams.containsKey(SEARCH_SPECIALITY_ID))
+            builder.appendQueryParameter(SEARCH_SPECIALITY_ID, queryParams.get(SEARCH_SPECIALITY_ID));
         System.out.println("Final url to get data from: " + builder.toString());
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, builder.toString(), null, new Response.Listener<JSONObject>() {
             @Override
@@ -177,7 +115,7 @@ public class DataService {
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
     }
 
-    public void getAppointemntsSubpage(FilteredAppointmentsResponseListener responseListener, String subpageUrl) {
+    public void getAppointemntsSubpage(JsonObjectResponseListener responseListener, String subpageUrl) {
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, subpageUrl, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -193,11 +131,11 @@ public class DataService {
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
     }
 
-    public void bookAppointment(HashMap<String, Integer> queryParams, AppointmentBookResponseListener responseListener) {
+    public void bookAppointment(HashMap<String, Integer> queryParams, JsonObjectResponseListener responseListener) {
         JSONObject postData = new JSONObject();
         try {
-            postData.put("termin", queryParams.get("termin"));
-            postData.put("uzytkownik", queryParams.get("uzytkownik"));
+            postData.put(BOOK_APPOINTMENT_ID, queryParams.get(BOOK_APPOINTMENT_ID));
+            postData.put(BOOK_USER_ID, queryParams.get(BOOK_USER_ID));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -205,22 +143,19 @@ public class DataService {
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, BOOK_APPOINTMENT_URL, postData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                System.out.println(response);
-                // redirect response to whatever implements
                 responseListener.onResponse(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
-                // handle invalid response
                 responseListener.onError(error.toString());
             }
         });
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(postRequest);
     }
 
-    public void registerTheUser(HashMap<String, String> queryParams, RegisterResponseListener responseListener) {
+    public void registerTheUser(HashMap<String, String> queryParams, StringResponseListener responseListener) {
         StringRequest postRequest = new StringRequest(Request.Method.POST, REGISTER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -241,7 +176,7 @@ public class DataService {
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(postRequest);
     }
 
-    public void getUserAppointments(String userID, UserAppointmentsResponseListener responseListener) {
+    public void getUserAppointments(String userID, JsonObjectResponseListener responseListener) {
         String URL = USER_INFO_URL + userID + '/';
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
             @Override
@@ -258,14 +193,14 @@ public class DataService {
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
     }
 
-    public void deleteUserAppointment(String appointmentID, AppointmentDeleteResponseListener responseListener) {
+    public void deleteUserAppointment(String appointmentID, StringResponseListener responseListener) {
         final int[] statusCode = new int[1];
         String URL = BOOKED_APPOINTMENTS_URL + appointmentID + '/';
         StringRequest deleteRequest = new StringRequest(Request.Method.DELETE, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 System.out.println("status code from DataService: " + statusCode[0]);
-                responseListener.onResponse(response);
+                responseListener.onResponse(String.valueOf(statusCode[0]));
             }
         }, new Response.ErrorListener() {
             @Override
@@ -285,10 +220,10 @@ public class DataService {
     public void updateAccountSettings(HashMap<String, String> putParams, JsonObjectResponseListener responseListener) {
         JSONObject postData = new JSONObject();
         try {
-            postData.put("id", putParams.get("id"));
-            postData.put(AccountSettingsActivity.EMAIL_UPDATE_API, putParams.get(AccountSettingsActivity.EMAIL_UPDATE_API));
-            postData.put(AccountSettingsActivity.OLD_PWD_UPDATE_API, putParams.get(AccountSettingsActivity.OLD_PWD_UPDATE_API));
-            postData.put(AccountSettingsActivity.NEW_PWD_UPDATE_API, putParams.get(AccountSettingsActivity.NEW_PWD_UPDATE_API));
+            postData.put(ID, putParams.get(ID));
+            postData.put(EMAIL, putParams.get(EMAIL));
+            postData.put(UPDATE_OLD_PWD, putParams.get(UPDATE_OLD_PWD));
+            postData.put(UPDATE_NEW_PWD, putParams.get(UPDATE_NEW_PWD));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -297,14 +232,12 @@ public class DataService {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println(response);
-                // redirect response to whatever implements
                 responseListener.onResponse(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
-                // handle invalid response
                 responseListener.onError(error.toString());
             }
         });
@@ -312,34 +245,31 @@ public class DataService {
     }
 
     public void updatePersonalSettings(HashMap<String, String> putParams, JsonObjectResponseListener responseListener) {
-        JSONObject postData = new JSONObject();
+        JSONObject putData = new JSONObject();
         try {
-            postData.put("id", putParams.get("id"));
-            postData.put(PersonalSettingsActivity.FIRST_NAME_UPDATE_API, putParams.get(PersonalSettingsActivity.FIRST_NAME_UPDATE_API));
-            postData.put(PersonalSettingsActivity.LAST_NAME_UPDATE_API, putParams.get(PersonalSettingsActivity.LAST_NAME_UPDATE_API));
-            postData.put(PersonalSettingsActivity.PHONE_UPDATE_API, putParams.get(PersonalSettingsActivity.PHONE_UPDATE_API));
-            postData.put(PersonalSettingsActivity.CITY_CODE_UPDATE_API, putParams.get(PersonalSettingsActivity.CITY_CODE_UPDATE_API));
-            postData.put(PersonalSettingsActivity.CITY_UPDATE_API, putParams.get(PersonalSettingsActivity.CITY_UPDATE_API));
-            postData.put(PersonalSettingsActivity.STREET_UPDATE_API, putParams.get(PersonalSettingsActivity.STREET_UPDATE_API));
-            postData.put(PersonalSettingsActivity.HOUSE_NUMBER_UPDATE_API, putParams.get(PersonalSettingsActivity.HOUSE_NUMBER_UPDATE_API));
-            System.out.println("postData --------------------------------------------------");
-            System.out.println(postData);
+            putData.put(ID, putParams.get(ID));
+            putData.put(FIRST_NAME, putParams.get(FIRST_NAME));
+            putData.put(LAST_NAME, putParams.get(LAST_NAME));
+            putData.put(PHONE, putParams.get(PHONE));
+            putData.put(CITY_CODE, putParams.get(CITY_CODE));
+            putData.put(CITY, putParams.get(CITY));
+            putData.put(STREET, putParams.get(STREET));
+            putData.put(HOUSE_NUMBER, putParams.get(HOUSE_NUMBER));
+            System.out.println(putData);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, USER_ACCOUNT_UPDATE_URL, postData, new Response.Listener<JSONObject>() {
+        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, USER_ACCOUNT_UPDATE_URL, putData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println(response);
-                // redirect response to whatever implements
                 responseListener.onResponse(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
-                // handle invalid response
                 responseListener.onError(error.toString());
             }
         });
@@ -347,8 +277,8 @@ public class DataService {
     }
 
     // used in both Account/Personal-SettingsActivity to display current user's data
-    public void userSettingsInfo(String ID, JsonObjectResponseListener responseListener) {
-        String URL = USER_ACCOUNT_INFO_URL + ID + "/";
+    public void userSettingsInfo(String id, JsonObjectResponseListener responseListener) {
+        String URL = USER_ACCOUNT_INFO_URL + id + "/";
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,  new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {

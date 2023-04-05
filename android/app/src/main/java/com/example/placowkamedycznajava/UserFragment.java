@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.placowkamedycznajava.utility.ApiParamNames;
+import com.example.placowkamedycznajava.utility.ConnectionAgent;
+import com.example.placowkamedycznajava.utility.DatesQueryHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +29,7 @@ import java.util.ArrayList;
 
 public class UserFragment extends Fragment implements UserAppointmentAdapter.OnClickListener {
 
+    SwipeRefreshLayout refreshLayout;
     RecyclerView recyclerView;
     UserAppointmentAdapter adapter;
     ArrayList<UserAppointment> appointmentArrayList;
@@ -46,6 +52,7 @@ public class UserFragment extends Fragment implements UserAppointmentAdapter.OnC
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user, container, false);
+        refreshLayout = view.findViewById(R.id.user_panel_refresh_layout);
         progressBar = view.findViewById(R.id.user_panel_progressBar);
         recyclerView = view.findViewById(R.id.userPanelRecyclerView);
         recyclerInfoView = view.findViewById(R.id.recycler_info_view);
@@ -53,41 +60,45 @@ public class UserFragment extends Fragment implements UserAppointmentAdapter.OnC
         initRecycler();
         getUserAppointments();
         initSwipeCallback();
+        initSwipeToRefresh();
 
         return view;
     }
 
     private void getUserAppointments() {
-        progressBar.setVisibility(View.VISIBLE);
+        // progressBar.setVisibility(View.VISIBLE);
+        refreshLayout.setRefreshing(true);
         DataService dataService = new DataService(getContext());
-        dataService.getUserAppointments(String.valueOf(MainActivity.userID), new DataService.UserAppointmentsResponseListener() {
+        dataService.getUserAppointments(String.valueOf(MainActivity.userID), new DataService.JsonObjectResponseListener() {
             @Override
             public void onResponse(JSONObject response) {
-                Toast.makeText(getContext(), response.toString(), Toast.LENGTH_LONG).show();
                 try {
-                    JSONArray usersAppointments = response.getJSONArray("wizyty");
+                    JSONArray usersAppointments = response.getJSONArray(ApiParamNames.USER_APPOINTMENTS_ARRAY);
+                    appointmentArrayList.clear();
+                    adapter.notifyDataSetChanged();
+
                     for (int i = 0; i < usersAppointments.length(); i++) {
                         JSONObject appointment = usersAppointments.getJSONObject(i);
                         appointmentArrayList.add(new UserAppointment(
-                                appointment.getInt("id"),
-                                DatesQueryHelper.formatDateTime(appointment.getString("termin")),
-                                appointment.getString("personel"),
-                                appointment.getString("specjalnosc")
+                                appointment.getInt(ApiParamNames.ID),
+                                DatesQueryHelper.formatDateTime(appointment.getString(ApiParamNames.USER_APPOINTMENTS_DATATIME)),
+                                appointment.getString(ApiParamNames.APPOINTMENTS_PERSONEL),
+                                appointment.getString(ApiParamNames.APPOINTMENTS_SPECIALITY)
                         ));
                     }
                     adapter.notifyItemRangeInserted(0, appointmentArrayList.size());
-                    progressBar.setVisibility(View.GONE);
+                    refreshLayout.setRefreshing(false);
                     checkIfEmpty();
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error happened during processing the data", Toast.LENGTH_LONG).show();
-                } catch (ParseException e) {
-                    Toast.makeText(getContext(), "Error happened during processing the datetime from server", Toast.LENGTH_LONG).show();
+
+                    // TODO: 05.04.2023 remove this toasts on production
+                } catch (JSONException | ParseException e) {
+                    Toast.makeText(getContext(), R.string.db_processing_error, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(getContext(), "Error happened during communication with server", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.db_general_error, Toast.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 System.out.println(message);
             }
@@ -105,30 +116,30 @@ public class UserFragment extends Fragment implements UserAppointmentAdapter.OnC
     // overrides recycleritem onclicks ------------------
     @Override
     public void onItemCLick(int position) {
-        // jeszcze nie wiem co tutaj
+        // possible 'more info' activity implementation or some popup
     }
 
     @Override
     public void onDeleteClick(int position) {
         deleteUserAppointment(position);
-
     }
     // --------------------------------------------------
 
     private void deleteUserAppointment(int position) {
         new DataService(getContext()).deleteUserAppointment(
                 String.valueOf(appointmentArrayList.get(position).getId()),
-                new DataService.AppointmentDeleteResponseListener() {
+                new DataService.StringResponseListener() {
                     @Override
                     public void onResponse(String response) {
                         appointmentArrayList.remove(position);
                         adapter.notifyItemRemoved(position);
                         checkIfEmpty();
+                        Toast.makeText(getContext(), R.string.appointment_cancel_successfull, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onError(String message) {
-                        Toast.makeText(getContext(), "Error happened on the server side", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.db_general_error, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -153,5 +164,19 @@ public class UserFragment extends Fragment implements UserAppointmentAdapter.OnC
     private void checkIfEmpty() {
         if (appointmentArrayList.isEmpty()) recyclerInfoView.setVisibility(View.VISIBLE);
         else recyclerInfoView.setVisibility(View.GONE);
+    }
+
+    private void initSwipeToRefresh() {
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!ConnectionAgent.isConnected(requireContext())) {
+                    Toast.makeText(getContext(), R.string.no_connection_toast, Toast.LENGTH_SHORT).show();
+                    refreshLayout.setRefreshing(false);
+                    return;
+                }
+                getUserAppointments();
+            }
+        });
     }
 }

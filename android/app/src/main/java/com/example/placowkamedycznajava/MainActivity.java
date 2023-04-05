@@ -21,8 +21,6 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
-import org.json.JSONObject;
-
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
@@ -31,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int userID;
     DrawerLayout drawerLayout;
     FrameLayout fragment_container;
-    // adding menu -------
     Menu drawerMenu;
 
     @Override
@@ -43,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // 2.1 ustaw ikonę do togglowania navigiation, i połącz z gotową funkcją (animacje)
+        // 2.1 ustaw ikonę do togglowania navigiation, i połącz z gotową funkcją
         drawerLayout = findViewById(R.id.draw_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar ,R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
@@ -67,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        userID = sharedPreferences.getInt(LoginActivity.LOGGED_USER_ID, -1);
+        userID = sharedPreferences.getInt(LoginActivity.SHARED_PREF_USER_ID, -1);
         // probably unnecessary
         if (userID == -1) {
             finish();
@@ -83,8 +80,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     @SuppressLint("NonConstantResourceId")
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // TODO: 28.03.2023 Handle actionbar items onClick
-        Toast.makeText(MainActivity.this, item.getTitle() + " clicked()", Toast.LENGTH_SHORT).show();
         switch (item.getItemId()) {
             case R.id.settings:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
@@ -110,9 +105,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else if (currentFragment instanceof AppointmentListFragment) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AppointmentSearchFragment()).commit();
         }
-
+        // if current fragment is SettingsFragment, redirect to search Fragment
+        else if (currentFragment instanceof SettingsFragment) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AppointmentSearchFragment()).commit();
+        }
         else {
-//            super.onBackPressed();
             showConfirmationDialog();
         }
     }
@@ -151,20 +148,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // call function on that fragment that will request appointments with params from previous Fragment
         listFragment.callForAppointments(getParams);
 
-        Toast.makeText(this, "params: " + getParams, Toast.LENGTH_LONG).show();
     }
 
     private void showConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Wylogować?")
+        builder.setMessage(R.string.logout_question)
                 .setCancelable(false)
-                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // yes clicked, log the user out
                         logUserOut();
                     }
                 })
-                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // nothing needs to happen
                     }
