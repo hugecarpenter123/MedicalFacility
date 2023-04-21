@@ -70,7 +70,7 @@
     <string name="new_pwds_different">Nowe hasła muszą się zgadzać</string>
     <string name="new_pwd_error">Wydarzył się błąd. Upewnij się, że wprowadzasz poprawne hasło</string>
     <string name="company_namy">Medicenter</string>
-    <string name="logout_question">Logout?</string>
+    <string name="logout_question">Wylogować?</string>
     <string name="delete_account">Usuń konto</string>
     <string name="delete_account_question">Czy na pewno chcesz usunąć konto?</string>
     <string name="delete_account_successful">Pomyślnie usunięto konto</string>

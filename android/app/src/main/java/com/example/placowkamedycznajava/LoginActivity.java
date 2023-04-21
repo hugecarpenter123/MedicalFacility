@@ -31,9 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // TODO: 18.03.2023 remove later --------
-        changeToMainActivity();
-        // ======================================
+//        changeToMainActivity(); // for debuging purposes
 
         loginInput = findViewById(R.id.username_input);
         passwordInput = findViewById(R.id.password_input);

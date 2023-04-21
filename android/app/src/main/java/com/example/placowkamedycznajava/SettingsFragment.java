@@ -1,10 +1,11 @@
 package com.example.placowkamedycznajava;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,6 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 public class SettingsFragment extends Fragment {
+
+    SettingsFragmentListener listener;
+
+    interface SettingsFragmentListener {
+        void logoutTheUserSignal();
+    }
 
     private final int REQUEST_CODE = 1;
     Button personal_settigns, account_settings;
@@ -39,20 +46,30 @@ public class SettingsFragment extends Fragment {
         });
 
         account_settings.setOnClickListener(button -> {
-            startActivity(new Intent(getContext(), AccountSettingsActivity.class));
             startActivityForResult(new Intent(getContext(), AccountSettingsActivity.class), REQUEST_CODE);
         });
 
         return view;
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof SettingsFragmentListener) {
+            listener = (SettingsFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + ": must implement SettingsFragmentListener");
+        }
+        super.onAttach(context);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             boolean ifDelete = data.getBooleanExtra("delete", false);
             if (ifDelete) {
-                // perform some operation
-            } else {
-                // perform some other operation
+                // inform MainActivity
+                listener.logoutTheUserSignal();
             }
         }
     }
