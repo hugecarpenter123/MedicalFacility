@@ -86,7 +86,7 @@ class TerminView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retrieve
         return queryset
 
 
-class WizytaView(generics.GenericAPIView, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,    mixins.DestroyModelMixin):
+class WizytaView(generics.GenericAPIView, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     queryset = Wizyta.objects.all().order_by('id')
     serializer_class = serializers.WizytaSerializer
 
@@ -180,7 +180,7 @@ class SearchInfoView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-class UzytkownikAccountInfoView(generics.UpdateAPIView, generics.RetrieveAPIView):
+class UzytkownikAccountInfoView(generics.UpdateAPIView, generics.RetrieveAPIView, generics.DestroyAPIView):
     serializer_class = serializers.UzytkownikAccountsSettingsSerializer
 
     def get_object(self):
@@ -192,3 +192,16 @@ class UzytkownikAccountInfoView(generics.UpdateAPIView, generics.RetrieveAPIView
             id = self.request.data.get("id", 0)
             user = get_object_or_404(User, pk=id)
         return user
+
+    def delete(self, request, *args, **kwargs):
+        # before delete, remove all user's appointments
+        user = self.get_object()
+        for wizyta in user.wizyta_set.all():
+            # free appointment
+            wizyta.termin.status = True
+            wizyta.termin.save()
+            # delete user appointment
+            wizyta.delete()
+        return super().delete(request, *args, **kwargs)
+
+
