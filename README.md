@@ -1,5 +1,5 @@
 <h2 style="text-align: center">MedicalFacility</h2>
-<p>MedicalFacility is an mobile and web application that enebles the user to register the account, login and interact with given facility by booking an appointment. User at any given moment can filter desired appointments by: personel, date or service type. Apart from that, change of account/personal settings can be done as well as unbooking any visit.
+<p>MedicalFacility is an mobile and web application that enebles the user to register the account, login and interact with given facility by booking an appointment. User at any given moment can filter desired appointments by: personel, date or service type. Apart from that, change of account/personal settings can be done as well as unbooking any visit. Program recognizes various errors starting with connection of the device and ending with validation of user inputs (some in progress).
 Application uses Django for backend and works mainly as API, for user experience side and further logic Java is used.</p>
 
 https://www.youtube.com/watch?v=nnML4bprHXI
