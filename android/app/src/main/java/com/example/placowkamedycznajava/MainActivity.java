@@ -24,7 +24,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        AppointmentSearchFragment.AppointmentSearchFragmentListener {
+        AppointmentSearchFragment.AppointmentSearchFragmentListener, SettingsFragment.SettingsFragmentListener {
 
     public static int userID;
     DrawerLayout drawerLayout;
@@ -171,14 +171,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void logUserOut() {
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        SharedPreferences prefs = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(LoginActivity.SHARED_PREF_USER_ID).apply();
         finish();
-        // TODO: 26.03.2023 usunąć USER_ID z sharedPreferences
     }
 
     private void unselectAllNavItems() {
         for (int i = 0; i < drawerMenu.size(); i++) {
             drawerMenu.getItem(i).setChecked(false);
         }
+    }
+
+    @Override
+    public void logoutTheUserSignal() {
+        logUserOut();
     }
 }
 

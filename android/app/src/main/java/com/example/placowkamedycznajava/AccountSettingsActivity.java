@@ -7,6 +7,7 @@ import static com.example.placowkamedycznajava.utility.ApiParamNames.*;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -42,6 +43,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("AccountsSettingsFragment onCreate()============");
         setContentView(R.layout.activity_account_settings);
 
         // set Toolbar
@@ -108,7 +110,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONObject response) {
                     System.out.println(response);
-                    Toast.makeText(AccountSettingsActivity.this, response.toString(), Toast.LENGTH_LONG).show();
                     try {
                         String newEmail = response.getString(EMAIL);
                         emailLabel.setText(newEmail);
@@ -191,7 +192,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
         new DataService(this).userSettingsInfo(String.valueOf(userID), new DataService.JsonObjectResponseListener() {
             @Override
             public void onResponse(JSONObject response) {
-                Toast.makeText(AccountSettingsActivity.this, response.toString(), Toast.LENGTH_LONG).show();
                 try {
                     String email = response.getString(EMAIL);
                     emailLabel.setText(email);
@@ -235,7 +235,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
                             public void onResponse(String response) {
                                 System.out.println(response.toString());
                                 Toast.makeText(AccountSettingsActivity.this, R.string.delete_account_successful, Toast.LENGTH_SHORT).show();
-                                // logout the user
+                                sendResultBack();
                             }
 
                             @Override
@@ -252,6 +252,13 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void sendResultBack() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("delete", true);
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 
 }

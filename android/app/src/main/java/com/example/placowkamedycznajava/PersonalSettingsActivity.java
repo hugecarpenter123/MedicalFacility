@@ -264,7 +264,6 @@ public class PersonalSettingsActivity extends AppCompatActivity {
         new DataService(this).userSettingsInfo(String.valueOf(userID), new DataService.JsonObjectResponseListener() {
             @Override
             public void onResponse(JSONObject response) {
-                Toast.makeText(PersonalSettingsActivity.this, response.toString(), Toast.LENGTH_LONG).show();
                 try {
                     String firstName = response.getString(FIRST_NAME);
                     firstNameLabel.setText(firstName);
