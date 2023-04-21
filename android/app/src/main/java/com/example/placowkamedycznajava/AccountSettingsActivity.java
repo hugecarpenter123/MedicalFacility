@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import static com.example.placowkamedycznajava.utility.ApiParamNames.*;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -14,6 +16,9 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.placowkamedycznajava.utility.ApiParamNames;
+import com.example.placowkamedycznajava.utility.ConnectionAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +36,8 @@ public class AccountSettingsActivity extends AppCompatActivity {
     RelativeLayout emailEditSublayout, pwdEditSublayout;
     ArrayList<RelativeLayout> subFormsArr;
     Button emailSubmit, pwdSubmit;
+    TextView deleteAccButton;
+    final DataService dataService = new DataService(AccountSettingsActivity.this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         newPwdInput = findViewById(R.id.password_edit_input);
         newPwdRepeatInput = findViewById(R.id.password_edit_repeat_input);
         emailLabel = findViewById(R.id.email_edit_current);
+        deleteAccButton = findViewById(R.id.delete_account_btn);
         initSubFormsArray();
 
 
@@ -149,6 +157,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 });
             }
         });
+
+        deleteAccButton.setOnClickListener((view) -> {
+            // TODO: 20.04.2023 onClick ask for confirmation, then make DELETE request to endpoit, and logout
+            showConfirmationDialog();
+        });
     }
 
     private void initSubFormsArray() {
@@ -203,4 +216,42 @@ public class AccountSettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void showConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AccountSettingsActivity.this);
+        builder.setMessage(R.string.delete_account_question)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // yes clicked ------------
+                        // 1. check the connection
+                        if (!ConnectionAgent.isConnected(AccountSettingsActivity.this)) {
+                            Toast.makeText(AccountSettingsActivity.this, R.string.no_connection_toast, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        // send DELETE request
+                        dataService.deleteUserAccount(String.valueOf(MainActivity.userID), new DataService.StringResponseListener() {
+                            @Override
+                            public void onResponse(String response) {
+                                System.out.println(response.toString());
+                                Toast.makeText(AccountSettingsActivity.this, R.string.delete_account_successful, Toast.LENGTH_SHORT).show();
+                                // logout the user
+                            }
+
+                            @Override
+                            public void onError(String message) {
+                                Toast.makeText(AccountSettingsActivity.this, R.string.delete_account_error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // nothing needs to happen
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
 }

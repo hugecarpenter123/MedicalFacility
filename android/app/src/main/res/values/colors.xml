@@ -13,4 +13,5 @@
     <color name="transparent">#00000000</color>
     <color name="subgrey">#D2D2D2</color>
     <color name="select_hint">#2841EA</color>
+    <color name="red">#E30000</color>
 </resources>

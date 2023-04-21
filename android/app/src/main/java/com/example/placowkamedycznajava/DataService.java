@@ -27,10 +27,11 @@ public class DataService {
     public static final String APPOINTMENTS_URL = "http://192.168.1.39:8000/api/termin";
     public static final String BOOK_APPOINTMENT_URL = "http://192.168.1.39:8000/api/wizyta/";
     public static final String REGISTER_URL = "http://192.168.1.39:8000/api/uzytkownik/";
-    public static final String USER_INFO_URL = "http://192.168.1.39:8000/api/uzytkownik/";
-    public static final String BOOKED_APPOINTMENTS_URL = "http://192.168.1.39:8000/api/wizyta/";
-    public static final String USER_ACCOUNT_UPDATE_URL = "http://192.168.1.39:8000/api/uzytkownik/konto/";
+    public static final String USER_INFO_URL = "http://192.168.1.39:8000/api/uzytkownik/";  // + `id/`
+    public static final String BOOKED_APPOINTMENTS_URL = "http://192.168.1.39:8000/api/wizyta/";  // + `id/`
+    public static final String USER_ACCOUNT_UPDATE_URL = "http://192.168.1.39:8000/api/uzytkownik/konto/";  // + `id/`
     public static final String USER_ACCOUNT_INFO_URL = "http://192.168.1.39:8000/api/uzytkownik/konto/"; // + `id/`
+    public static final String USER_ACCOUNT_DELETE_URL = "http://192.168.1.39:8000/api/uzytkownik/konto/"; // + `id/`
     Context context;
 
     public DataService(Context context) {
@@ -218,6 +219,8 @@ public class DataService {
     }
 
     public void updateAccountSettings(HashMap<String, String> putParams, JsonObjectResponseListener responseListener) {
+        String URL = USER_ACCOUNT_UPDATE_URL + putParams.get(ID) + "/";
+
         JSONObject postData = new JSONObject();
         try {
             postData.put(ID, putParams.get(ID));
@@ -228,7 +231,7 @@ public class DataService {
             e.printStackTrace();
         }
 
-        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, USER_ACCOUNT_UPDATE_URL, postData, new Response.Listener<JSONObject>() {
+        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, URL, postData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println(response);
@@ -245,6 +248,8 @@ public class DataService {
     }
 
     public void updatePersonalSettings(HashMap<String, String> putParams, JsonObjectResponseListener responseListener) {
+        String URL = USER_ACCOUNT_UPDATE_URL + putParams.get(ID) + "/";
+
         JSONObject putData = new JSONObject();
         try {
             putData.put(ID, putParams.get(ID));
@@ -260,7 +265,7 @@ public class DataService {
             e.printStackTrace();
         }
 
-        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, USER_ACCOUNT_UPDATE_URL, putData, new Response.Listener<JSONObject>() {
+        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, URL, putData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println(response);
@@ -292,5 +297,29 @@ public class DataService {
         });
 
         HttpRequestSingleton.getInstance(context).getRequestQueue().add(getRequest);
+    }
+
+    public void deleteUserAccount(String id, StringResponseListener responseListener) {
+        String URL = USER_ACCOUNT_DELETE_URL + id + "/";
+        final int[] statusCode = new int[1];
+        StringRequest deleteRequest = new StringRequest(Request.Method.DELETE, URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                responseListener.onResponse(String.valueOf(statusCode[0]));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                responseListener.onError(error.toString());
+            }
+        })
+        {
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                statusCode[0] = response.statusCode;
+                return super.parseNetworkResponse(response);
+            }
+        };
+        HttpRequestSingleton.getInstance(context).getRequestQueue().add(deleteRequest);
     }
 }
