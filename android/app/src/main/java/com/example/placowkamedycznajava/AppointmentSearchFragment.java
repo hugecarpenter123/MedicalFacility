@@ -43,7 +43,6 @@ public class AppointmentSearchFragment extends Fragment {
     private Button searchButton;
 
     // DatePicker -----------
-    private DatesQueryHelper datesQueryHelper;
     private DatePickerDialog datePickerDialog;
     private Button datePickerButton;
 
@@ -70,7 +69,6 @@ public class AppointmentSearchFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_appointment_search, container, false);
 
         // init date helper & datePicker
-        datesQueryHelper = new DatesQueryHelper();
         datePickerButton = view.findViewById(R.id.date_picker_button);
         initDatePicker();
         datePickerButton.setOnClickListener(button -> {
@@ -117,7 +115,7 @@ public class AppointmentSearchFragment extends Fragment {
                     appointmentQ = datePickerButton.getText().toString();
                 } else {
                     datePickerButton.setVisibility(View.GONE);
-                    appointmentQ = datesQueryHelper.getDateQueryDict().get(appointmentArr[position]);
+                    appointmentQ = DatesQueryHelper.dateQueryDict.get(appointmentArr[position]);
                 }
             }
         });
@@ -169,7 +167,7 @@ public class AppointmentSearchFragment extends Fragment {
     public void initDropDownMenus(View view) {
         dropdownSpeciality = view.findViewById(R.id.autoCompleteSpeciality);
         dropdownPersonel = view.findViewById(R.id.autoCompletePersonel);
-        appointmentArr = datesQueryHelper.getAppointmentArr();
+        appointmentArr = DatesQueryHelper.appointmentArr;
         dropdownAppointment = view.findViewById(R.id.autoCompleteAppointment);
         appointmentArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.list_item, appointmentArr);
         dropdownAppointment.setAdapter(appointmentArrayAdapter);
