@@ -1,45 +1,31 @@
 package com.example.placowkamedycznajava.utility;
 
+import android.os.Build;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 public class DatesQueryHelper {
 
-    private final String[] appointmentArr = {"Dzisiaj", "Jutro", "Najbliższe 10 wizyt", "Najbliższe 20 wizyt", "Najbliższy miesiąc", "Najbliższe 3 miesiące", "Najbliższe pół roku", "Konkretna data"};
-    private HashMap<String, String> dateQueryDict;
-
-    public DatesQueryHelper() {
-        fillDict();
+    public static final String[] appointmentArr = {"Dzisiaj", "Jutro", "Najbliższe 10 wizyt", "Najbliższe 20 wizyt", "Najbliższy miesiąc", "Najbliższe 3 miesiące", "Najbliższe pół roku", "Konkretna data"};
+    public static final LinkedHashMap<String, String> dateQueryDict;
+    static {
+        dateQueryDict = new LinkedHashMap<>();
+        dateQueryDict.put("Dzisiaj", "1");
+        dateQueryDict.put("Jutro", tomorrowDateAsString());
+        dateQueryDict.put("Najbliższe 10 wizyt", "10w");
+        dateQueryDict.put("Najbliższe 20 wizyt", "20w");
+        dateQueryDict.put("Najbliższy miesiąc", "30");
+        dateQueryDict.put("Najbliższe 3 miesiące", "90");
+        dateQueryDict.put("Najbliższe pół roku", "180");
     }
 
-    public void fillDict() {
-        // server takes appointment dates in theese formats:
-        // 30 -> 30 next days
-        // 10w -> 10 next appointments
-        // 12-04-2023 -> specific date
-        dateQueryDict = new HashMap<>();
-        dateQueryDict.put(appointmentArr[0], "1");
-        dateQueryDict.put(appointmentArr[1], tomorrowDateAsString());
-        dateQueryDict.put(appointmentArr[2], "10w");
-        dateQueryDict.put(appointmentArr[3], "20w");
-        dateQueryDict.put(appointmentArr[4], "30");
-        dateQueryDict.put(appointmentArr[5], "90");
-        dateQueryDict.put(appointmentArr[6], "150");
-        dateQueryDict.put(appointmentArr[7], "300");
-    }
-
-    public String[] getAppointmentArr() {
-        return appointmentArr;
-    }
-
-    public HashMap<String, String> getDateQueryDict() {
-        return dateQueryDict;
-    }
-
-    private String tomorrowDateAsString() {
+    private static String tomorrowDateAsString() {
         Date d = new Date(new Date().getTime() + 86400000);
         String pattern = "dd-MM-yyyy";
         SimpleDateFormat DateFor = new SimpleDateFormat(pattern, Locale.getDefault());
